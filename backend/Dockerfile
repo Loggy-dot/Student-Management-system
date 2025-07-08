@@ -17,7 +17,7 @@ COPY . .
 RUN mkdir -p uploads && chmod 755 uploads
 
 # Expose port (Render will set PORT environment variable)
-EXPOSE $PORT
+EXPOSE 10000
 
 # Set environment to production
 ENV NODE_ENV=production

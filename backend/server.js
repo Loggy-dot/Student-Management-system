@@ -341,6 +341,15 @@ function initializeDatabase() {
             Department VARCHAR(100) NOT NULL
         )`);
 
+        // Additional report table for updates
+        db.run(`CREATE TABLE IF NOT EXISTS students_report_update (
+            StudentId INTEGER,
+            StudentName VARCHAR(100) NOT NULL,
+            Course VARCHAR(100) NOT NULL,
+            Grade VARCHAR(2) NOT NULL,
+            Department VARCHAR(100) NOT NULL
+        )`);
+
         // Insert initial data after tables are created
         insertInitialData();
     });
