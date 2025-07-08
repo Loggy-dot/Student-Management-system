@@ -11,7 +11,7 @@ const validator = require('validator');
 const path = require('path');
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 10000;
 
 // Configuration
 const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-in-production';
@@ -640,7 +640,7 @@ app.post('/api/students/enhanced', authenticateToken, authorizeRole(['admin', 't
       const studentEmail = Email;
       const defaultPassword = 'password123';
 
-      db.run('INSERT OR IGNORE INTO student_credentials (StudentId, Email, Password) VALUES (?, ?, ?)',
+      db.run('INSERT OR IGNORE INTO student_credentials (StudentId, Email, PasswordHash) VALUES (?, ?, ?)',
         [StudentId, studentEmail, defaultPassword], (credErr) => {
         if (credErr) {
           console.warn('Warning: Could not create student credentials:', credErr.message);
@@ -1311,7 +1311,7 @@ app.post('/api/student-credentials', (req, res) => {
         return res.status(400).json({ error: 'StudentId, Email, and Password are required' });
     }
     
-    db.run('INSERT INTO student_credentials (StudentId, Email, Password) VALUES (?, ?, ?)',
+    db.run('INSERT INTO student_credentials (StudentId, Email, PasswordHash) VALUES (?, ?, ?)',
         [StudentId, Email, Password], function(err) {
         if (err) {
             if (err.message.includes('UNIQUE constraint failed')) {
