@@ -28,9 +28,9 @@ Your Student Management System has been successfully indexed and is **ready for 
 4. **Set Environment Variables**:
    ```env
    NODE_ENV=production
-   JWT_SECRET=your-super-secret-key-here-minimum-32-characters
-   EMAIL_USER=your-gmail@gmail.com
-   EMAIL_PASS=your-gmail-app-password
+   JWT_SECRET=123456782345673856378
+   EMAIL_USER=kwaklogout12321@gmail.com
+   EMAIL_PASS=Aquinas123
    FRONTEND_URL=https://your-frontend-name.onrender.com
    ```
 

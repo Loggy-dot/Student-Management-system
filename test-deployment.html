@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deployment Test - Student Management System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .warning { background-color: #fff3cd; border-color: #ffeaa7; }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background-color: #0056b3; }
+        input {
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            width: 200px;
+        }
+        .log {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Student Management System - Deployment Test</h1>
+        
+        <div class="test-section">
+            <h3>📡 Backend URL Configuration</h3>
+            <label>Backend URL:</label>
+            <input type="text" id="backendUrl" placeholder="https://your-backend.onrender.com" />
+            <button onclick="saveBackendUrl()">Save URL</button>
+            <div id="urlStatus"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>🔍 Health Check Test</h3>
+            <button onclick="testHealth()">Test Backend Health</button>
+            <div id="healthResult"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>🔐 Login Test</h3>
+            <div>
+                <label>Username:</label>
+                <input type="text" id="username" value="admin" />
+            </div>
+            <div>
+                <label>Password:</label>
+                <input type="password" id="password" value="admin123" />
+            </div>
+            <button onclick="testLogin()">Test Admin Login</button>
+            <button onclick="testStudentLogin()">Test Student Login</button>
+            <div id="loginResult"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>📊 CORS Test</h3>
+            <button onclick="testCors()">Test CORS Configuration</button>
+            <div id="corsResult"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>📝 Test Log</h3>
+            <div id="testLog" class="log"></div>
+            <button onclick="clearLog()">Clear Log</button>
+        </div>
+    </div>
+
+    <script>
+        let backendUrl = localStorage.getItem('backendUrl') || '';
+        
+        // Load saved backend URL
+        if (backendUrl) {
+            document.getElementById('backendUrl').value = backendUrl;
+            updateUrlStatus();
+        }
+
+        function log(message) {
+            const logDiv = document.getElementById('testLog');
+            const timestamp = new Date().toLocaleTimeString();
+            logDiv.textContent += `[${timestamp}] ${message}\n`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        function clearLog() {
+            document.getElementById('testLog').textContent = '';
+        }
+
+        function saveBackendUrl() {
+            backendUrl = document.getElementById('backendUrl').value.trim();
+            if (backendUrl && !backendUrl.startsWith('http')) {
+                backendUrl = 'https://' + backendUrl;
+                document.getElementById('backendUrl').value = backendUrl;
+            }
+            localStorage.setItem('backendUrl', backendUrl);
+            updateUrlStatus();
+            log(`Backend URL saved: ${backendUrl}`);
+        }
+
+        function updateUrlStatus() {
+            const statusDiv = document.getElementById('urlStatus');
+            if (backendUrl) {
+                statusDiv.innerHTML = `<div class="success">✅ Backend URL: ${backendUrl}</div>`;
+            } else {
+                statusDiv.innerHTML = `<div class="warning">⚠️ Please enter your backend URL</div>`;
+            }
+        }
+
+        async function testHealth() {
+            if (!backendUrl) {
+                alert('Please enter your backend URL first');
+                return;
+            }
+
+            const resultDiv = document.getElementById('healthResult');
+            resultDiv.innerHTML = '<div class="warning">🔄 Testing health endpoint...</div>';
+            log('Testing health endpoint...');
+
+            try {
+                const response = await fetch(`${backendUrl}/api/health`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    resultDiv.innerHTML = `<div class="success">✅ Backend is healthy! Response: ${JSON.stringify(data)}</div>`;
+                    log(`Health check successful: ${JSON.stringify(data)}`);
+                } else {
+                    resultDiv.innerHTML = `<div class="error">❌ Health check failed. Status: ${response.status}</div>`;
+                    log(`Health check failed with status: ${response.status}`);
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Cannot connect to backend: ${error.message}</div>`;
+                log(`Health check error: ${error.message}`);
+            }
+        }
+
+        async function testLogin() {
+            if (!backendUrl) {
+                alert('Please enter your backend URL first');
+                return;
+            }
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const resultDiv = document.getElementById('loginResult');
+            
+            resultDiv.innerHTML = '<div class="warning">🔄 Testing admin login...</div>';
+            log(`Testing admin login with username: ${username}`);
+
+            try {
+                const response = await fetch(`${backendUrl}/api/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, password }),
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    resultDiv.innerHTML = `<div class="success">✅ Login successful! Token received: ${data.token ? 'Yes' : 'No'}</div>`;
+                    log(`Login successful: ${JSON.stringify(data)}`);
+                } else {
+                    resultDiv.innerHTML = `<div class="error">❌ Login failed: ${data.error || 'Unknown error'}</div>`;
+                    log(`Login failed: ${JSON.stringify(data)}`);
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Login request failed: ${error.message}</div>`;
+                log(`Login request error: ${error.message}`);
+            }
+        }
+
+        async function testStudentLogin() {
+            if (!backendUrl) {
+                alert('Please enter your backend URL first');
+                return;
+            }
+
+            const email = 'akwesi.bonsu@student.edu';
+            const password = 'password123';
+            const resultDiv = document.getElementById('loginResult');
+            
+            resultDiv.innerHTML = '<div class="warning">🔄 Testing student login...</div>';
+            log(`Testing student login with email: ${email}`);
+
+            try {
+                const response = await fetch(`${backendUrl}/api/auth/student-login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password }),
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    resultDiv.innerHTML = `<div class="success">✅ Student login successful! Token received: ${data.token ? 'Yes' : 'No'}</div>`;
+                    log(`Student login successful: ${JSON.stringify(data)}`);
+                } else {
+                    resultDiv.innerHTML = `<div class="error">❌ Student login failed: ${data.error || 'Unknown error'}</div>`;
+                    log(`Student login failed: ${JSON.stringify(data)}`);
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Student login request failed: ${error.message}</div>`;
+                log(`Student login request error: ${error.message}`);
+            }
+        }
+
+        async function testCors() {
+            if (!backendUrl) {
+                alert('Please enter your backend URL first');
+                return;
+            }
+
+            const resultDiv = document.getElementById('corsResult');
+            resultDiv.innerHTML = '<div class="warning">🔄 Testing CORS configuration...</div>';
+            log('Testing CORS configuration...');
+
+            try {
+                const response = await fetch(`${backendUrl}/api/health`, {
+                    method: 'OPTIONS',
+                });
+
+                if (response.ok || response.status === 204) {
+                    resultDiv.innerHTML = '<div class="success">✅ CORS is properly configured</div>';
+                    log('CORS test successful');
+                } else {
+                    resultDiv.innerHTML = `<div class="error">❌ CORS issue detected. Status: ${response.status}</div>`;
+                    log(`CORS test failed with status: ${response.status}`);
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ CORS test failed: ${error.message}</div>`;
+                log(`CORS test error: ${error.message}`);
+            }
+        }
+
+        // Initialize
+        updateUrlStatus();
+        log('Deployment test tool loaded. Please enter your backend URL and run tests.');
+    </script>
+</body>
+</html>
