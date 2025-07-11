@@ -14,7 +14,7 @@ const Reports = () => {
   const fetchReports = async () => {
     try {
       setLoading(true);
-      const res = await axios.get('http://localhost:5000/api/students-report-update');
+      const res = await axios.get('http://localhost:10000/api/students-report-update');
       setReports(res.data);
     } catch (err) {
       setError('Failed to load reports');

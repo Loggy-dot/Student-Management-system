@@ -83,7 +83,7 @@ const TeacherManagement = () => {
   const handleDeleteTeacher = async (teacherId) => {
     if (window.confirm('Are you sure you want to delete this teacher?')) {
       try {
-        await axios.delete(`http://localhost:5000/api/teachers/${teacherId}`);
+        await axios.delete(`http://localhost:10000/api/teachers/${teacherId}`);
         fetchTeachers();
       } catch (error) {
         console.error('Error deleting teacher:', error);
@@ -101,23 +101,23 @@ const TeacherManagement = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto p-6">
+    <div className="max-w-7xl mx-auto p-3 sm:p-6">
       {/* Header */}
-      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6 mb-4 sm:mb-6 transition-colors duration-200">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Teacher Management</h1>
-            <p className="text-gray-600">Manage faculty and teaching staff</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2">👨‍🏫 Teacher Management</h1>
+            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300">Manage faculty and teaching staff</p>
           </div>
-          
+
           <div className="mt-4 sm:mt-0">
             <button
               onClick={handleAddTeacher}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg flex items-center space-x-2 transition-colors"
+              className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg flex items-center justify-center space-x-2 transition-all duration-200 transform hover:scale-105 shadow-lg"
               type="button"
             >
-              <Plus className="h-5 w-5" />
-              <span>Add New Teacher</span>
+              <Plus className="h-4 sm:h-5 w-4 sm:w-5" />
+              <span className="text-sm sm:text-base">Add New Teacher</span>
             </button>
           </div>
         </div>
@@ -197,7 +197,7 @@ const TeacherManagement = () => {
                         {teacher.ProfilePicture ? (
                           <img 
                             className="h-10 w-10 rounded-full object-cover" 
-                            src={`http://localhost:5000${teacher.ProfilePicture}`} 
+                            src={`http://localhost:10000${teacher.ProfilePicture}`}
                             alt={`${teacher.FirstName} ${teacher.LastName}`}
                           />
                         ) : (

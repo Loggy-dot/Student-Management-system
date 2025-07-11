@@ -57,10 +57,10 @@ const StudentModal = ({ isOpen, onClose, student, onSave, departments }) => {
     try {
       if (student) {
         console.log('Updating student:', student.StudentId);
-        await axios.put(`http://localhost:5000/api/students-report/${student.StudentId}`, formData);
+        await axios.put(`http://localhost:10000/api/students-report/${student.StudentId}`, formData);
       } else {
         console.log('Adding new student');
-        const response = await axios.post('http://localhost:5000/api/students-report', formData);
+        const response = await axios.post('http://localhost:10000/api/students-report', formData);
         console.log('Student added successfully:', response.data);
       }
       onSave();

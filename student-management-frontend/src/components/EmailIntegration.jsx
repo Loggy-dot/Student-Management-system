@@ -48,9 +48,9 @@ const EmailIntegration = () => {
   const fetchData = async () => {
     try {
       const [studentsRes, teachersRes, departmentsRes] = await Promise.all([
-        axios.get('http://localhost:5000/api/students/enhanced'),
-        axios.get('http://localhost:5000/api/teachers'),
-        axios.get('http://localhost:5000/api/departments')
+        axios.get('http://localhost:10000/api/students/enhanced'),
+        axios.get('http://localhost:10000/api/teachers'),
+        axios.get('http://localhost:10000/api/departments')
       ]);
       
       setStudents(studentsRes.data);
@@ -116,18 +116,25 @@ const EmailIntegration = () => {
     setLoading(true);
     
     try {
-      // In a real implementation, you would send this to your backend
       const emailPayload = {
         recipients: recipients.map(r => r.email),
         subject: emailData.subject,
         message: emailData.message,
-        recipientType: emailData.recipientType
+        recipientType: emailData.recipientType,
+        departmentId: selectedDepartment
       };
 
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      alert(`Email sent successfully to ${recipients.length} recipients!`);
+      const response = await axios.post('http://localhost:10000/api/send-bulk-email', emailPayload, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+
+      if (response.data.success) {
+        alert(`Email sent successfully to ${response.data.sentCount} recipients!`);
+      } else {
+        throw new Error('Failed to send email');
+      }
       
       // Reset form
       setEmailData({

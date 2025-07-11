@@ -23,7 +23,7 @@ const StudentDashboard = ({ student, onLogout }) => {
   const fetchGrades = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`http://localhost:5000/api/student-grades/${student.StudentId}`);
+      const response = await axios.get(`http://localhost:10000/api/student-grades/${student.StudentId}`);
       setGrades(response.data.grades || []);
     } catch (err) {
       setError(err.response?.data?.error || 'Failed to fetch grades');

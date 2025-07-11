@@ -24,16 +24,24 @@ const StudentLogin = ({ onLogin }) => {
     setLoading(true);
     setError('');
 
+    console.log('Student login attempt:', formData); // Debug log
+
     try {
-      const response = await axios.post('http://localhost:5000/api/student-login', formData);
+      const response = await axios.post('http://localhost:10000/api/student-login', formData);
+      console.log('Login response:', response.data); // Debug log
       if (response.data.success) {
         onLogin(response.data.student);
       }
     } catch (err) {
+      console.error('Login error:', err.response?.data || err.message); // Debug log
       setError(err.response?.data?.error || 'Login failed. Please try again.');
     } finally {
       setLoading(false);
     }
+  };
+
+  const fillDemoCredentials = (email) => {
+    setFormData({ email, password: 'password123' });
   };
 
   return (
@@ -133,12 +141,48 @@ const StudentLogin = ({ onLogin }) => {
           </form>
 
           {/* Demo Credentials */}
-          <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-            <h3 className="text-sm font-medium text-gray-700 mb-2">Demo Credentials:</h3>
-            <div className="text-xs text-gray-600 space-y-1">
-              <p><strong>Email:</strong> akwesi.bonsu@student.edu</p>
-              <p><strong>Password:</strong> password123</p>
-              <p className="text-gray-500 mt-2">Or use any student email from the system with password: password123</p>
+          <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+            <h3 className="text-sm font-medium text-blue-800 dark:text-blue-300 mb-2">🎓 Demo Student Credentials:</h3>
+            <div className="text-xs text-blue-700 dark:text-blue-300 space-y-2">
+              <div className="bg-white dark:bg-gray-800 p-2 rounded border flex justify-between items-center">
+                <div>
+                  <p><strong>Email:</strong> james.tah@student.edu</p>
+                  <p><strong>Password:</strong> password123</p>
+                </div>
+                <button
+                  onClick={() => fillDemoCredentials('james.tah@student.edu')}
+                  className="px-2 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600 transition-colors"
+                >
+                  Use
+                </button>
+              </div>
+              <div className="bg-white dark:bg-gray-800 p-2 rounded border flex justify-between items-center">
+                <div>
+                  <p><strong>Email:</strong> nana.owusu@student.edu</p>
+                  <p><strong>Password:</strong> password123</p>
+                </div>
+                <button
+                  onClick={() => fillDemoCredentials('nana.owusu@student.edu')}
+                  className="px-2 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600 transition-colors"
+                >
+                  Use
+                </button>
+              </div>
+              <div className="bg-white dark:bg-gray-800 p-2 rounded border flex justify-between items-center">
+                <div>
+                  <p><strong>Email:</strong> eric.gyamfi@student.edu</p>
+                  <p><strong>Password:</strong> password123</p>
+                </div>
+                <button
+                  onClick={() => fillDemoCredentials('eric.gyamfi@student.edu')}
+                  className="px-2 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600 transition-colors"
+                >
+                  Use
+                </button>
+              </div>
+              <p className="text-blue-600 dark:text-blue-400 mt-2 text-center font-medium">
+                ✨ Use any of these credentials to test the student portal
+              </p>
             </div>
           </div>
         </div>

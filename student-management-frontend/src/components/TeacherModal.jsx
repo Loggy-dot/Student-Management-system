@@ -36,7 +36,7 @@ const TeacherModal = ({ isOpen, onClose, teacher, onSave, departments }) => {
         Position: teacher.Position || '',
         Salary: teacher.Salary || ''
       });
-      setPreviewUrl(teacher.ProfilePicture ? `http://localhost:5000${teacher.ProfilePicture}` : null);
+      setPreviewUrl(teacher.ProfilePicture ? `http://localhost:10000${teacher.ProfilePicture}` : null);
     } else {
       setFormData({
         EmployeeId: '',
@@ -98,14 +98,14 @@ const TeacherModal = ({ isOpen, onClose, teacher, onSave, departments }) => {
 
       if (teacher) {
         // Update existing teacher
-        await axios.put(`http://localhost:5000/api/teachers/${teacher.TeacherId}`, submitData, {
+        await axios.put(`http://localhost:10000/api/teachers/${teacher.TeacherId}`, submitData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
         });
       } else {
         // Add new teacher
-        await axios.post('http://localhost:5000/api/teachers', submitData, {
+        await axios.post('http://localhost:10000/api/teachers', submitData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },

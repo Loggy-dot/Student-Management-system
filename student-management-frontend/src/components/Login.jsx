@@ -120,9 +120,9 @@ const Login = () => {
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? (
-                    <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
-                  ) : (
                     <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                  ) : (
+                    <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
                   )}
                 </button>
               </div>
@@ -178,7 +178,7 @@ const Login = () => {
         {/* Footer */}
         <div className="text-center mt-8">
           <p className="text-sky-100 text-sm drop-shadow">
-            © 2025 Student Database Management System
+            © 2025 Student Database Management System by Logout
           </p>
         </div>
       </div>

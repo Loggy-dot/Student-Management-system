@@ -1,0 +1,13 @@
+{
+  "EmployeeId": "TEST001",
+  "FirstName": "Test",
+  "LastName": "Teacher",
+  "Email": "test.teacher@school.edu",
+  "Phone": "555-0123",
+  "DateOfBirth": "1980-01-01",
+  "Qualification": "PhD",
+  "Specialization": "Computer Science",
+  "DepartmentId": "1",
+  "Position": "Professor",
+  "Salary": "50000"
+}

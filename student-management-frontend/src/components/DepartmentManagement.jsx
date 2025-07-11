@@ -17,7 +17,7 @@ const DepartmentManagement = () => {
   const fetchDepartments = async () => {
     try {
       setLoading(true);
-      const res = await axios.get('http://localhost:5000/api/departments');
+      const res = await axios.get('http://localhost:10000/api/departments');
       setDepartments(res.data);
     } catch (err) {
       setError('Failed to load departments');
@@ -31,7 +31,7 @@ const DepartmentManagement = () => {
     try {
       setError('');
       setSubmitting(true);
-      await axios.post('http://localhost:5000/api/departments', { DepartmentName: name, Head: head });
+      await axios.post('http://localhost:10000/api/departments', { DepartmentName: name, Head: head });
       setName('');
       setHead('');
       fetchDepartments();
@@ -45,7 +45,7 @@ const DepartmentManagement = () => {
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this department?')) return;
     try {
-      await axios.delete(`http://localhost:5000/api/departments/${id}`);
+      await axios.delete(`http://localhost:10000/api/departments/${id}`);
       fetchDepartments();
     } catch (err) {
       setError('Failed to delete department');

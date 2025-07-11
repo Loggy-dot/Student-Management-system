@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   GraduationCap,
@@ -19,10 +19,27 @@ import {
   UserCheck,
   Mail
 } from 'lucide-react';
+import ThemeToggle from './ThemeToggle';
 
 const Sidebar = ({ user, onLogout }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const location = useLocation();
+
+  // Check if mobile
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+      if (window.innerWidth < 768) {
+        setIsCollapsed(true);
+      }
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const navigation = [
     { name: 'Dashboard', href: '/', icon: Home, gradient: 'from-blue-500 to-cyan-500' },
@@ -191,6 +208,12 @@ const Sidebar = ({ user, onLogout }) => {
               <Bell className="h-4 w-4 text-slate-400 hover:text-cyan-400 cursor-pointer transition-colors duration-200" />
             </div>
             
+            {/* Theme Toggle */}
+            <div className="flex items-center justify-between px-4 py-2">
+              <span className="text-sm text-slate-400">Theme</span>
+              <ThemeToggle />
+            </div>
+
             <button
               onClick={onLogout}
               className="w-full flex items-center space-x-3 px-4 py-3 text-sm text-red-400 hover:text-white hover:bg-gradient-to-r hover:from-red-500 hover:to-red-600 rounded-xl transition-all duration-200 font-medium transform hover:scale-105"

@@ -37,8 +37,8 @@ const Dashboard = () => {
     try {
       setLoading(true);
       const [studentsRes, departmentsRes] = await Promise.all([
-        axios.get('http://localhost:5000/api/students-report'),
-        axios.get('http://localhost:5000/api/departments')
+        axios.get('http://localhost:10000/api/students-report'),
+        axios.get('http://localhost:10000/api/departments')
       ]);
 
       const students = studentsRes.data;

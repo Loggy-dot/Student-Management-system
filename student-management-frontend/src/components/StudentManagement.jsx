@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Search, Plus, Edit, Trash2, Filter } from 'lucide-react';
 import axios from 'axios';
 import StudentModal from './StudentModal';
+import LoadingSpinner from './LoadingSpinner';
+import ConfirmDialog from './ConfirmDialog';
 
 const StudentManagement = () => {
   const [students, setStudents] = useState([]);
@@ -12,11 +14,12 @@ const StudentManagement = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [departments, setDepartments] = useState([]);
+  const [confirmDialog, setConfirmDialog] = useState({ isOpen: false, studentId: null, studentName: '' });
 
   const fetchStudents = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('http://localhost:5000/api/students-report');
+      const response = await axios.get('http://localhost:10000/api/students-report');
       setStudents(response.data);
       setFilteredStudents(response.data);
     } catch (error) {
@@ -29,7 +32,7 @@ const StudentManagement = () => {
 
   const fetchDepartments = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/departments');
+      const response = await axios.get('http://localhost:10000/api/departments');
       const departmentNames = response.data.map(dept => dept.DepartmentName);
       setDepartments(departmentNames);
     } catch (error) {
@@ -71,15 +74,24 @@ const StudentManagement = () => {
     setShowModal(true);
   };
 
-  const handleDeleteStudent = async (studentId) => {
-    if (window.confirm('Are you sure you want to delete this student?')) {
-      try {
-        await axios.delete(`http://localhost:5000/api/students-report/${studentId}`);
-        fetchStudents();
-      } catch (error) {
-        console.error('Error deleting student:', error);
-        alert('Error deleting student');
-      }
+  const handleDeleteStudent = (student) => {
+    setConfirmDialog({
+      isOpen: true,
+      studentId: student.StudentId,
+      studentName: student.StudentName
+    });
+  };
+
+  const confirmDelete = async () => {
+    try {
+      await axios.delete(`http://localhost:10000/api/students-report/${confirmDialog.studentId}`);
+      fetchStudents();
+      window.showToast && window.showToast(`Student ${confirmDialog.studentName} deleted successfully`, 'success');
+    } catch (error) {
+      console.error('Error deleting student:', error);
+      window.showToast && window.showToast('Failed to delete student', 'error');
+    } finally {
+      setConfirmDialog({ isOpen: false, studentId: null, studentName: '' });
     }
   };
 
@@ -94,11 +106,7 @@ const StudentManagement = () => {
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-96">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-    );
+    return <LoadingSpinner size="lg" text="Loading students..." />;
   }
 
   return (
@@ -221,7 +229,7 @@ const StudentManagement = () => {
                       </button>
 
                       <button
-                        onClick={() => handleDeleteStudent(student.StudentId)}
+                        onClick={() => handleDeleteStudent(student)}
                         className="text-red-600 hover:text-red-900"
                         type="button"
                       >
@@ -253,6 +261,18 @@ const StudentManagement = () => {
         student={selectedStudent}
         onSave={handleSaveStudent}
         departments={departments}
+      />
+
+      {/* Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={confirmDialog.isOpen}
+        title="Delete Student"
+        message={`Are you sure you want to delete ${confirmDialog.studentName}? This action cannot be undone.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        type="danger"
+        onConfirm={confirmDelete}
+        onCancel={() => setConfirmDialog({ isOpen: false, studentId: null, studentName: '' })}
       />
     </div>
   );
