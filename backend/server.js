@@ -38,6 +38,11 @@ app.use(cors({
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// Ensure uploads folder exists
+if (!fs.existsSync(UPLOAD_PATH)) {
+  fs.mkdirSync(UPLOAD_PATH, { recursive: true });
+}
+
 // Serve uploaded files
 app.use('/uploads', express.static(UPLOAD_PATH));
 
@@ -168,15 +173,17 @@ const sendGradeNotification = async (email, studentName, courseName, grade) => {
   }
 };
 
-// Database setup - Delete old database to fix column issues
+// Database setup - keep existing DB in production, reset only in development
 const dbPath = path.join(__dirname, 'students.db');
-if (fs.existsSync(dbPath)) {
-    console.log('🗑️ Deleting old database to fix column issues...');
+const shouldResetDb = (process.env.NODE_ENV || 'development') === 'development' && process.env.RESET_DB === 'true';
+
+if (shouldResetDb && fs.existsSync(dbPath)) {
+    console.log('🗑️ Resetting local database (development mode)...');
     try {
         fs.unlinkSync(dbPath);
-        console.log('✅ Old database deleted successfully');
+        console.log('✅ Local database reset successfully');
     } catch (err) {
-        console.log('⚠️ Could not delete old database:', err.message);
+        console.log('⚠️ Could not reset local database:', err.message);
     }
 }
 
@@ -184,7 +191,7 @@ const db = new sqlite3.Database(dbPath, (err) => {
     if (err) {
         console.error('Error opening database:', err.message);
     } else {
-        console.log('✅ Connected to fresh SQLite database');
+        console.log('✅ Connected to SQLite database');
         initializeDatabase();
     }
 });
