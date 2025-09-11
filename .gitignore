@@ -12,6 +12,9 @@ yarn-error.log*
 .env.test.local
 .env.production.local
 
+# Allow production env files for deployment
+!student-management-frontend/.env.production
+
 # Build outputs
 dist/
 build/

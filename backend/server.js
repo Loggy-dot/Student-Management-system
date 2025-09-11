@@ -29,6 +29,7 @@ app.use(cors({
     'http://localhost:5173',
     'http://localhost:5174',
     'http://localhost:3000',
+    'https://student-management-system-p1sf.onrender.com',
     process.env.FRONTEND_URL
   ].filter(Boolean),
   credentials: true,
