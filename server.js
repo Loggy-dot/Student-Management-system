@@ -77,7 +77,7 @@ try {
 
 // Serve frontend for all other routes in production
 if (isProduction) {
-  app.get('*', (req, res) => {
+  app.get('/*', (req, res) => {
     const indexPath = path.join(__dirname, 'student-management-frontend', 'dist', 'index.html');
     if (fs.existsSync(indexPath)) {
       res.sendFile(indexPath);
