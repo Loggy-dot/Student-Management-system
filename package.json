@@ -7,7 +7,7 @@
     "start": "node server.js",
     "postinstall": "npm run setup",
     "setup": "cd backend && npm install && cd ../student-management-frontend && npm install --include=dev",
-    "build": "cd student-management-frontend && npm run build",
+    "build": "cd student-management-frontend && npm install --include=dev && npm run build",
     "dev": "cd backend && npm run dev",
     "test": "cd backend && npm test"
   },
