@@ -28,6 +28,7 @@ router.use(cors({
     'http://localhost:5173',
     'http://localhost:5174',
     'http://localhost:3000',
+    'https://student-management-system-p1sf.onrender.com',
     process.env.FRONTEND_URL
   ].filter(Boolean),
   credentials: true,
@@ -181,8 +182,80 @@ router.get('/health', (req, res) => {
   res.json({ status: 'OK', message: 'Students Management API is running' });
 });
 
-// Add your API routes here
-// Example:
+// ============ AUTHENTICATION ROUTES ============
+
+// Admin/Teacher Login
+router.post('/auth/login', async (req, res) => {
+  try {
+    const { username, password } = req.body;
+
+    // For demo purposes, using hardcoded credentials
+    // In production, these should be stored in the database with hashed passwords
+    const validCredentials = {
+      'admin': { password: 'admin123', role: 'admin', name: 'System Administrator' },
+      'teacher': { password: 'teacher123', role: 'teacher', name: 'John Doe' }
+    };
+
+    if (!validCredentials[username] || validCredentials[username].password !== password) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    const user = validCredentials[username];
+    const token = jwt.sign(
+      { username, role: user.role, name: user.name },
+      JWT_SECRET,
+      { expiresIn: JWT_EXPIRES_IN }
+    );
+
+    res.json({
+      success: true,
+      token,
+      user: {
+        username,
+        role: user.role,
+        name: user.name
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Student Login
+router.post('/auth/student-login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email and password are required' });
+    }
+
+    // For demo purposes, using simple password check
+    // In production, use proper password hashing
+    if (password === 'password123') {
+      const token = jwt.sign(
+        { email, role: 'student' },
+        JWT_SECRET,
+        { expiresIn: JWT_EXPIRES_IN }
+      );
+
+      res.json({
+        success: true,
+        token,
+        user: {
+          email,
+          role: 'student'
+        }
+      });
+    } else {
+      res.status(401).json({ error: 'Invalid credentials' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Example students route
 router.get('/students', (req, res) => {
   db.all('SELECT * FROM students', (err, rows) => {
     if (err) {
