@@ -416,4 +416,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Built with ❤️ for educational institutions worldwide**
 
-*This system is designed to scale from small schools to large universities, providing enterprise-grade functionality with an intuitive user experience.*
+*This system is designed to scale from small schools to large universities, providing enterprise-grade functionality with an intuitive user experience.*#   s t u d e n t s - m a n a g e m e n t  
+ 
