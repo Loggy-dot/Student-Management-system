@@ -7,6 +7,7 @@ import { Users, GraduationCap, BookOpen, TrendingUp, Award, Calendar } from 'luc
 import axios from 'axios';
 import LoadingSpinner from './LoadingSpinner';
 import { useTheme } from '../context/ThemeContext';
+import { buildApiUrl, API_ENDPOINTS } from '../config/api';
 
 const AdvancedDashboard = () => {
   const [dashboardData, setDashboardData] = useState({
@@ -35,9 +36,9 @@ const AdvancedDashboard = () => {
       
       // Fetch all required data
       const [studentsRes, teachersRes, departmentsRes] = await Promise.all([
-        axios.get('http://localhost:10000/api/students/enhanced'),
-        axios.get('http://localhost:10000/api/teachers'),
-        axios.get('http://localhost:10000/api/departments')
+        axios.get(buildApiUrl(API_ENDPOINTS.STUDENTS_ENHANCED)),
+        axios.get(buildApiUrl(API_ENDPOINTS.TEACHERS)),
+        axios.get(buildApiUrl(API_ENDPOINTS.DEPARTMENTS))
       ]);
 
       const students = studentsRes.data;

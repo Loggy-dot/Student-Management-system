@@ -6,14 +6,14 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
-const app = express();
-const PORT = process.env.PORT || 10000;
+// Create router instead of app
+const router = express.Router();
 
 // Middleware
-app.use(cors());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use('/uploads', express.static('uploads'));
+router.use(cors());
+router.use(bodyParser.json());
+router.use(bodyParser.urlencoded({ extended: true }));
+router.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Create uploads directory if it doesn't exist
 if (!fs.existsSync('uploads')) {
@@ -31,10 +31,13 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
-// Database setup - DELETE OLD DATABASE AND START FRESH
-const dbPath = 'students.db';
-if (fs.existsSync(dbPath)) {
-  console.log('🗑️ Deleting old database...');
+// Database setup - Use proper path for production
+const dbPath = path.join(__dirname, 'students.db');
+console.log('📍 Database path:', dbPath);
+
+// Only delete database in development mode
+if (process.env.NODE_ENV !== 'production' && fs.existsSync(dbPath)) {
+  console.log('🗑️ Deleting old database (development mode)...');
   fs.unlinkSync(dbPath);
 }
 
@@ -187,12 +190,12 @@ function insertSampleData() {
 }
 
 // Health check
-app.get('/api/health', (req, res) => {
+router.get('/health', (req, res) => {
   res.json({ status: 'OK', message: 'Unified Students Database Backend is running' });
 });
 
 // Login endpoint
-app.post('/api/auth/login', (req, res) => {
+router.post('/auth/login', (req, res) => {
   const { username, password } = req.body;
   
   db.get('SELECT * FROM login_users WHERE username = ? AND password = ?',
@@ -218,7 +221,7 @@ app.post('/api/auth/login', (req, res) => {
 });
 
 // Get all students (enhanced endpoint)
-app.get('/api/students/enhanced', (req, res) => {
+router.get('/students/enhanced', (req, res) => {
   db.all(`SELECT s.*, d.DepartmentName 
           FROM students s 
           LEFT JOIN departments d ON s.DepartmentId = d.DepartmentId 
@@ -230,8 +233,21 @@ app.get('/api/students/enhanced', (req, res) => {
   });
 });
 
+// Get all students (reports endpoint for backward compatibility)
+router.get('/students-report', (req, res) => {
+  db.all(`SELECT s.*, d.DepartmentName as Department
+          FROM students s 
+          LEFT JOIN departments d ON s.DepartmentId = d.DepartmentId 
+          ORDER BY s.StudentId DESC`, (err, rows) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+    res.json(rows);
+  });
+});
+
 // Add new student (enhanced)
-app.post('/api/students/enhanced', upload.single('profilePicture'), (req, res) => {
+router.post('/students/enhanced', upload.single('profilePicture'), (req, res) => {
   const { FirstName, LastName, Email, Phone, DepartmentId, AcademicYear, Semester, DateOfBirth, Address, EmergencyContact, EmergencyPhone } = req.body;
   const StudentName = `${FirstName} ${LastName}`;
   const ProfilePicture = req.file ? `/uploads/${req.file.filename}` : null;
@@ -264,7 +280,7 @@ app.post('/api/students/enhanced', upload.single('profilePicture'), (req, res) =
 });
 
 // Get all teachers
-app.get('/api/teachers', (req, res) => {
+router.get('/teachers', (req, res) => {
   db.all(`SELECT t.*, d.DepartmentName 
           FROM teachers t 
           LEFT JOIN departments d ON t.DepartmentId = d.DepartmentId 
@@ -277,7 +293,7 @@ app.get('/api/teachers', (req, res) => {
 });
 
 // Add new teacher
-app.post('/api/teachers', upload.single('profilePicture'), (req, res) => {
+router.post('/teachers', upload.single('profilePicture'), (req, res) => {
   const { EmployeeId, FirstName, LastName, Email, Phone, DepartmentId, Position, Qualification, Specialization, Salary } = req.body;
   const ProfilePicture = req.file ? `/uploads/${req.file.filename}` : null;
 
@@ -298,7 +314,7 @@ app.post('/api/teachers', upload.single('profilePicture'), (req, res) => {
 });
 
 // Get all departments
-app.get('/api/departments', (req, res) => {
+router.get('/departments', (req, res) => {
   db.all('SELECT * FROM departments ORDER BY DepartmentName', (err, rows) => {
     if (err) {
       return res.status(500).json({ error: err.message });
@@ -307,18 +323,5 @@ app.get('/api/departments', (req, res) => {
   });
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`🚀 Unified server running on port ${PORT}`);
-});
-
-// Graceful shutdown
-process.on('SIGINT', () => {
-  db.close((err) => {
-    if (err) {
-      console.error(err.message);
-    }
-    console.log('Database connection closed.');
-    process.exit(0);
-  });
-});
+// Export the router
+module.exports = router;

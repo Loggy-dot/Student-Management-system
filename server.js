@@ -59,19 +59,30 @@ if (isProduction) {
 // First try to use the server-module.js if it exists
 let backendRouter;
 try {
-  if (fs.existsSync(path.join(__dirname, 'backend', 'server-module.js'))) {
-    backendRouter = require('./backend/server-module');
-    console.log('Using modular backend API');
-  } else {
-    // Fallback to using the unified-server.js
+  const serverModulePath = path.join(__dirname, 'backend', 'server-module.js');
+  const unifiedServerPath = path.join(__dirname, 'backend', 'unified-server.js');
+  
+  console.log('Checking backend files:');
+  console.log('- server-module.js exists:', fs.existsSync(serverModulePath));
+  console.log('- unified-server.js exists:', fs.existsSync(unifiedServerPath));
+  
+  // Force use of unified-server for now since it's working locally
+  if (fs.existsSync(unifiedServerPath)) {
     backendRouter = require('./backend/unified-server');
-    console.log('Using unified backend server');
+    console.log('✅ Using unified backend server (unified-server.js)');
+  } else if (fs.existsSync(serverModulePath)) {
+    backendRouter = require('./backend/server-module');
+    console.log('✅ Using modular backend API (server-module.js)');
+  } else {
+    throw new Error('No backend module found');
   }
+  
   app.use('/api', backendRouter);
+  console.log('✅ Backend router mounted at /api');
 } catch (error) {
-  console.error('Error loading backend:', error);
+  console.error('❌ Error loading backend:', error);
   app.use('/api', (req, res) => {
-    res.status(500).json({ error: 'Backend server could not be loaded' });
+    res.status(500).json({ error: 'Backend server could not be loaded', details: error.message });
   });
 }
 

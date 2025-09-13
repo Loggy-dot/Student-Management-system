@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import { buildApiUrl, API_ENDPOINTS } from '../config/api';
 
 const Dashboard = () => {
   const [stats, setStats] = useState({
@@ -37,20 +38,25 @@ const Dashboard = () => {
     try {
       setLoading(true);
       const [studentsRes, departmentsRes] = await Promise.all([
-        axios.get('http://localhost:10000/api/students-report'),
-        axios.get('http://localhost:10000/api/departments')
+        axios.get(buildApiUrl(API_ENDPOINTS.STUDENTS_ENHANCED)),
+        axios.get(buildApiUrl(API_ENDPOINTS.DEPARTMENTS))
       ]);
 
       const students = studentsRes.data;
       const departments = departmentsRes.data;
 
-      // Calculate stats
-      const totalCourses = new Set(students.flatMap(s => [s.Course1, s.Course2])).size;
-      const avgGPA = students.reduce((acc, student) => {
-        const grade1 = student.Grade1 === 'A' ? 4 : student.Grade1 === 'B' ? 3 : student.Grade1 === 'C' ? 2 : 1;
-        const grade2 = student.Grade2 === 'A' ? 4 : student.Grade2 === 'B' ? 3 : student.Grade2 === 'C' ? 2 : 1;
-        return acc + (grade1 + grade2) / 2;
-      }, 0) / students.length;
+      // Calculate stats with safe fallbacks
+      const courseFields = students.flatMap(s => [s.Course1, s.Course2].filter(Boolean));
+      const totalCourses = new Set(courseFields).size;
+      const gradeValues = students
+        .map(s => {
+          const g1 = s.Grade1 ? (s.Grade1 === 'A' ? 4 : s.Grade1 === 'B' ? 3 : s.Grade1 === 'C' ? 2 : 1) : null;
+          const g2 = s.Grade2 ? (s.Grade2 === 'A' ? 4 : s.Grade2 === 'B' ? 3 : s.Grade2 === 'C' ? 2 : 1) : null;
+          if (g1 != null && g2 != null) return (g1 + g2) / 2;
+          return null;
+        })
+        .filter(v => v != null);
+      const avgGPA = gradeValues.length ? (gradeValues.reduce((a, b) => a + b, 0) / gradeValues.length) : 0;
 
       setStats({
         totalStudents: students.length,
@@ -287,8 +293,9 @@ const Dashboard = () => {
             
             <div className="space-y-4">
               {recentStudents.map((student, index) => {
-                const avgGrade = ((student.Grade1 === 'A' ? 4 : student.Grade1 === 'B' ? 3 : student.Grade1 === 'C' ? 2 : 1) +
-                                (student.Grade2 === 'A' ? 4 : student.Grade2 === 'B' ? 3 : student.Grade2 === 'C' ? 2 : 1)) / 2;
+                const g1 = student.Grade1 ? (student.Grade1 === 'A' ? 4 : student.Grade1 === 'B' ? 3 : student.Grade1 === 'C' ? 2 : 1) : null;
+                const g2 = student.Grade2 ? (student.Grade2 === 'A' ? 4 : student.Grade2 === 'B' ? 3 : student.Grade2 === 'C' ? 2 : 1) : null;
+                const avgGrade = (g1 != null && g2 != null) ? ((g1 + g2) / 2) : null;
                 
                 const getDepartmentColor = (department) => {
                   const colors = {
@@ -304,24 +311,24 @@ const Dashboard = () => {
                 
                 return (
                   <div 
-                    key={student.StudentId}
-                    className="flex items-center space-x-4 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors duration-200"
+                  key={student.StudentId}
+                  className="flex items-center space-x-4 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors duration-200"
                   >
-                    <div className={`h-12 w-12 rounded-xl bg-gradient-to-r ${getDepartmentColor(student.Department)} flex items-center justify-center shadow-lg`}>
-                      <span className="text-white font-bold">
-                        {student.StudentName.split(' ').map(n => n[0]).join('')}
-                      </span>
-                    </div>
-                    
-                    <div className="flex-1">
-                      <p className="font-semibold text-gray-900">{student.StudentName}</p>
-                      <p className="text-sm text-gray-600">ID: {student.StudentId}</p>
-                    </div>
-                    
-                    <div className="text-right">
-                      <p className="text-sm font-medium text-gray-900">GPA: {avgGrade.toFixed(1)}</p>
-                      <p className="text-xs text-gray-500">{student.Department}</p>
-                    </div>
+                  <div className={`h-12 w-12 rounded-xl bg-gradient-to-r ${getDepartmentColor(student.Department || student.DepartmentName)} flex items-center justify-center shadow-lg`}>
+                  <span className="text-white font-bold">
+                  {(student.StudentName || [student.FirstName, student.LastName].filter(Boolean).join(' ') || 'U').split(' ').map(n => n[0]).join('')}
+                  </span>
+                  </div>
+                  
+                  <div className="flex-1">
+                  <p className="font-semibold text-gray-900">{student.StudentName || [student.FirstName, student.LastName].filter(Boolean).join(' ') || 'Unknown'}</p>
+                  <p className="text-sm text-gray-600">ID: {student.StudentId}</p>
+                  </div>
+                  
+                  <div className="text-right">
+                  <p className="text-sm font-medium text-gray-900">GPA: {avgGrade != null ? avgGrade.toFixed(1) : 'N/A'}</p>
+                  <p className="text-xs text-gray-500">{student.Department || student.DepartmentName || 'N/A'}</p>
+                  </div>
                     
                     <div className={`w-3 h-3 rounded-full ${
                       avgGrade >= 3.5 ? 'bg-green-400' :
