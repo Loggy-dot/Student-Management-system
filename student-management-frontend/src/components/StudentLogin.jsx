@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { User, Lock, Eye, EyeOff, LogIn } from 'lucide-react';
 import axios from 'axios';
+import { API_BASE_URL } from '../config/api';
 
 const StudentLogin = ({ onLogin }) => {
   const [formData, setFormData] = useState({
@@ -27,7 +28,7 @@ const StudentLogin = ({ onLogin }) => {
     console.log('Student login attempt:', formData); // Debug log
 
     try {
-      const response = await axios.post('http://localhost:10000/api/student-login', formData);
+      const response = await axios.post(`${API_BASE_URL}/api/student-login`, formData);
       console.log('Login response:', response.data); // Debug log
       if (response.data.success) {
         onLogin(response.data.student);

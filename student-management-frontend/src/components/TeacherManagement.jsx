@@ -83,7 +83,7 @@ const TeacherManagement = () => {
   const handleDeleteTeacher = async (teacherId) => {
     if (window.confirm('Are you sure you want to delete this teacher?')) {
       try {
-        await axios.delete(`http://localhost:10000/api/teachers/${teacherId}`);
+        await axios.delete(`${API_BASE_URL}/api/teachers/${teacherId}`);
         fetchTeachers();
       } catch (error) {
         console.error('Error deleting teacher:', error);
@@ -197,7 +197,7 @@ const TeacherManagement = () => {
                         {teacher.ProfilePicture ? (
                           <img 
                             className="h-10 w-10 rounded-full object-cover" 
-                            src={`http://localhost:10000${teacher.ProfilePicture}`}
+                            src={`${API_BASE_URL}${teacher.ProfilePicture}`}
                             alt={`${teacher.FirstName} ${teacher.LastName}`}
                           />
                         ) : (

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, User, Mail, Phone, Calendar, MapPin, Upload, Camera } from 'lucide-react';
 import axios from 'axios';
+import { API_BASE_URL } from '../config/api';
 
 const EnhancedStudentModal = ({ isOpen, onClose, student, onSave, departments }) => {
   const [formData, setFormData] = useState({
@@ -38,7 +39,7 @@ const EnhancedStudentModal = ({ isOpen, onClose, student, onSave, departments })
         AcademicYear: student.AcademicYear || '',
         Semester: student.Semester || ''
       });
-      setPreviewUrl(student.ProfilePicture ? `http://localhost:10000${student.ProfilePicture}` : null);
+      setPreviewUrl(student.ProfilePicture ? `${API_BASE_URL}${student.ProfilePicture}` : null);
     } else {
       setFormData({
         StudentId: '',
@@ -101,14 +102,14 @@ const EnhancedStudentModal = ({ isOpen, onClose, student, onSave, departments })
 
       if (student) {
         // Update existing student
-        await axios.put(`http://localhost:10000/api/students/enhanced/${student.StudentId}`, submitData, {
+        await axios.put(`${API_BASE_URL}/api/students/enhanced/${student.StudentId}`, submitData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
         });
       } else {
         // Add new student
-        await axios.post('http://localhost:10000/api/students/enhanced', submitData, {
+        await axios.post(`${API_BASE_URL}/api/students/enhanced`, submitData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },

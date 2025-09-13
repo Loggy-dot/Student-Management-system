@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Building, Plus, Trash2, Users, AlertCircle } from 'lucide-react';
 import axios from 'axios';
+import { API_BASE_URL } from '../config/api';
 
 const DepartmentManagement = () => {
   const [departments, setDepartments] = useState([]);
@@ -17,7 +18,7 @@ const DepartmentManagement = () => {
   const fetchDepartments = async () => {
     try {
       setLoading(true);
-      const res = await axios.get('http://localhost:10000/api/departments');
+      const res = await axios.get(`${API_BASE_URL}/api/departments`);
       setDepartments(res.data);
     } catch (err) {
       setError('Failed to load departments');
@@ -31,7 +32,7 @@ const DepartmentManagement = () => {
     try {
       setError('');
       setSubmitting(true);
-      await axios.post('http://localhost:10000/api/departments', { DepartmentName: name, Head: head });
+      await axios.post(`${API_BASE_URL}/api/departments`, { DepartmentName: name, Head: head });
       setName('');
       setHead('');
       fetchDepartments();
@@ -45,7 +46,7 @@ const DepartmentManagement = () => {
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this department?')) return;
     try {
-      await axios.delete(`http://localhost:10000/api/departments/${id}`);
+      await axios.delete(`${API_BASE_URL}/api/departments/${id}`);
       fetchDepartments();
     } catch (err) {
       setError('Failed to delete department');

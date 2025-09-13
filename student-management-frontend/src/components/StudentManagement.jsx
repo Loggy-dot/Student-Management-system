@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Plus, Edit, Trash2, Filter } from 'lucide-react';
 import axios from 'axios';
+import { API_BASE_URL } from '../config/api';
 import StudentModal from './StudentModal';
 import LoadingSpinner from './LoadingSpinner';
 import ConfirmDialog from './ConfirmDialog';
@@ -19,7 +20,7 @@ const StudentManagement = () => {
   const fetchStudents = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('http://localhost:10000/api/students-report');
+      const response = await axios.get(`${API_BASE_URL}/api/students-report`);
       setStudents(response.data);
       setFilteredStudents(response.data);
     } catch (error) {
@@ -32,7 +33,7 @@ const StudentManagement = () => {
 
   const fetchDepartments = async () => {
     try {
-      const response = await axios.get('http://localhost:10000/api/departments');
+      const response = await axios.get(`${API_BASE_URL}/api/departments`);
       const departmentNames = response.data.map(dept => dept.DepartmentName);
       setDepartments(departmentNames);
     } catch (error) {
@@ -84,7 +85,7 @@ const StudentManagement = () => {
 
   const confirmDelete = async () => {
     try {
-      await axios.delete(`http://localhost:10000/api/students-report/${confirmDialog.studentId}`);
+      await axios.delete(`${API_BASE_URL}/api/students-report/${confirmDialog.studentId}`);
       fetchStudents();
       window.showToast && window.showToast(`Student ${confirmDialog.studentName} deleted successfully`, 'success');
     } catch (error) {

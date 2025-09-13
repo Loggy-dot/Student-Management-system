@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, User, Mail, Phone, Calendar, MapPin, Upload, Camera, GraduationCap, Briefcase } from 'lucide-react';
 import axios from 'axios';
+import { API_BASE_URL } from '../config/api';
 
 const TeacherModal = ({ isOpen, onClose, teacher, onSave, departments }) => {
   const [formData, setFormData] = useState({
@@ -36,7 +37,7 @@ const TeacherModal = ({ isOpen, onClose, teacher, onSave, departments }) => {
         Position: teacher.Position || '',
         Salary: teacher.Salary || ''
       });
-      setPreviewUrl(teacher.ProfilePicture ? `http://localhost:10000${teacher.ProfilePicture}` : null);
+      setPreviewUrl(teacher.ProfilePicture ? `${API_BASE_URL}${teacher.ProfilePicture}` : null);
     } else {
       setFormData({
         EmployeeId: '',
@@ -98,7 +99,7 @@ const TeacherModal = ({ isOpen, onClose, teacher, onSave, departments }) => {
 
       if (teacher) {
         // Update existing teacher
-        await axios.put(`http://localhost:10000/api/teachers/${teacher.TeacherId}`, submitData, {
+        await axios.put(`${API_BASE_URL}/api/teachers/${teacher.TeacherId}`, submitData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },

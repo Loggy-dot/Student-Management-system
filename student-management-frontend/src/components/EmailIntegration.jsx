@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Mail, Send, Users, Filter, Calendar, Bell } from 'lucide-react';
 import axios from 'axios';
+import { API_BASE_URL } from '../config/api';
 
 const EmailIntegration = () => {
   const [emailData, setEmailData] = useState({
@@ -48,9 +49,9 @@ const EmailIntegration = () => {
   const fetchData = async () => {
     try {
       const [studentsRes, teachersRes, departmentsRes] = await Promise.all([
-        axios.get('http://localhost:10000/api/students/enhanced'),
-        axios.get('http://localhost:10000/api/teachers'),
-        axios.get('http://localhost:10000/api/departments')
+        axios.get(`${API_BASE_URL}/api/students/enhanced`),
+        axios.get(`${API_BASE_URL}/api/teachers`),
+        axios.get(`${API_BASE_URL}/api/departments`)
       ]);
       
       setStudents(studentsRes.data);
@@ -124,7 +125,7 @@ const EmailIntegration = () => {
         departmentId: selectedDepartment
       };
 
-      const response = await axios.post('http://localhost:10000/api/send-bulk-email', emailPayload, {
+      const response = await axios.post(`${API_BASE_URL}/api/send-bulk-email`, emailPayload, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
